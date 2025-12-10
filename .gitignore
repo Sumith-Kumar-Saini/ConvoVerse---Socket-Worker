@@ -1,0 +1,30 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.DS_Store
+build/
+dist/
+tmp/
+logs/
+
+# Editor-specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Test coverage reports
+coverage/
+
+# Build artifacts
+*.log
+*.pid
+*.seed
+*.srs

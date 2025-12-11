@@ -1,6 +1,6 @@
 import { buildApp } from ".";
 import ENV from "./config/env";
-import RedisClient from "./config/redis";
+import RedisClient from "../common/config/redis";
 
 const fastify = buildApp();
 

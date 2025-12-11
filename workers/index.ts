@@ -1,30 +1,50 @@
 import { Worker } from "bullmq";
 import RedisClient from "../common/config/redis";
-import { generateStream, randomTxt } from "./work";
+import { generateNumberStream, generateStream, randomTxt } from "./work";
 
-const redis_url = process.env.REDIS_URL || "redis://localhost:6379";
+async function initWorker() {
+  // Ensure Redis client is initialized ONCE
+  const redis = await RedisClient.getBase();
 
-RedisClient.setupClient(redis_url);
-const connection = RedisClient.getClient();
+  // Prepare random text BEFORE worker starts
+  const randomText = await randomTxt();
 
-let randomText: string | null = null;
-
-(async () => {
-  randomText = await randomTxt();
-})();
-
-new Worker(
-  "llm-msg",
-  async (job) => {
-    const stream = generateStream(randomText!);
-    const redisClient = RedisClient.getClient();
-    for await (const chunk of stream) {
-      await redisClient.publish(`job:${job.id}`, JSON.stringify({ chunk }));
+  // Create worker
+  const worker = new Worker(
+    "llm-msg",
+    async (job) => {
+      //   const stream = generateStream(randomText, 20);
+      const stream = generateNumberStream(50, 0);
+      for await (const chunk of stream) {
+        process.stdout.write(chunk + "\r\n");
+        await redis.publish(
+          "job:stream",
+          JSON.stringify({ chunk, roomId: job.data.roomId })
+        );
+      }
+      await redis.publish(
+        "job:end",
+        JSON.stringify({ roomId: job.data.roomId })
+      );
+    },
+    {
+      connection: redis,
+      concurrency: 50,
+      removeOnComplete: { count: 5 },
+      removeOnFail: { count: 0 },
     }
-    await redisClient.publish(
-      `job:${job.id}`,
-      JSON.stringify({ completed: true })
-    );
-  },
-  { connection }
-);
+  );
+
+  worker.on("completed", (job) => {
+    console.log(`Job ${job.id} completed`);
+  });
+
+  worker.on("failed", (job, err) => {
+    console.error(`Job ${job?.id} failed:`, err);
+  });
+}
+
+initWorker().catch((err) => {
+  console.error("Worker initialization failed:", err);
+  process.exit(1);
+});

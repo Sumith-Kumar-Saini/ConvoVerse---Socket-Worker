@@ -4,14 +4,17 @@ import RedisClient from "../common/config/redis";
 
 const fastify = buildApp();
 
-const start = async () => {
+async function start() {
   try {
-    await fastify.listen({ port: ENV.PORT, host: ENV.HOST });
-    // RedisClient.setupClient(ENV.REDIS_URL);
+    await RedisClient.getBase();
+    await fastify.listen({
+      port: ENV.PORT,
+      host: ENV.HOST,
+    });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
   }
-};
+}
 
 start();

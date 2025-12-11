@@ -2,7 +2,7 @@ import fs from "fs";
 
 export function randomTxt(): Promise<string> {
   return new Promise((resolve, reject) => {
-    fs.readFile("../lib/test.txt", (err, data) => {
+    fs.readFile("lib/test.txt", (err, data) => {
       if (err) return reject(err);
       resolve(data.toString());
     });
@@ -14,6 +14,16 @@ export async function* generateStream(text: string, rounds: number = 10) {
     const chunk = text.slice(i, i + rounds);
     await delay(300);
     yield chunk;
+  }
+}
+
+export async function* generateNumberStream(
+  rounds: number = 100,
+  ms: number = 100
+) {
+  for (let i = 0; i < rounds; i++) {
+    await delay(ms);
+    yield i;
   }
 }
 

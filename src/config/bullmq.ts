@@ -1,8 +1,13 @@
 import RedisClient from "../../common/config/redis";
 import { Queue } from "bullmq";
 
-const connection = RedisClient.getClient();
+export class LLMQueue {
+  private static instance: Queue | null = null;
 
-const LLMQueue = new Queue("llm-msg", { connection });
-
-export { LLMQueue };
+  static async getLLMQueue(): Promise<Queue> {
+    if (this.instance) return this.instance;
+    const connection = await RedisClient.getBase();
+    this.instance = new Queue("llm-msg", { connection });
+    return this.instance;
+  }
+}

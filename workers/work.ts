@@ -9,10 +9,13 @@ export function randomTxt(): Promise<string> {
   });
 }
 
-export async function* generateStream(text: string, rounds: number = 10) {
+export async function* generateStream(
+  text: string,
+  { rounds = 10, ms = 300 }: { rounds?: number; ms?: number }
+) {
   for (let i = 0; i < text.length; i += rounds) {
     const chunk = text.slice(i, i + rounds);
-    await delay(300);
+    await delay(ms);
     yield chunk;
   }
 }

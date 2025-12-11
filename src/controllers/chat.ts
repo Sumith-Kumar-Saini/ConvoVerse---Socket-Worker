@@ -1,7 +1,6 @@
 import { Socket } from "socket.io";
 import SocketController from "../interfaces/socketController";
 import { FastifyInstance } from "fastify";
-import RedisClient from "../../common/config/redis";
 import { LLMQueue } from "../config/bullmq";
 import { generateRandomText } from "../utils/randomText";
 

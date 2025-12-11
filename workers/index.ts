@@ -13,8 +13,8 @@ async function initWorker() {
   const worker = new Worker(
     "llm-msg",
     async (job) => {
-      //   const stream = generateStream(randomText, 20);
-      const stream = generateNumberStream(50, 0);
+      const stream = generateStream(randomText, { rounds: 100, ms: 100 });
+      //   const stream = generateNumberStream(100, 100);
       for await (const chunk of stream) {
         process.stdout.write(chunk + "\r\n");
         await redis.publish(

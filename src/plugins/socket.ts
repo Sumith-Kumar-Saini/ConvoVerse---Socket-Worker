@@ -7,7 +7,7 @@ export const socketPlugin = (fastify: FastifyInstance) => {
     new ChatSocketController().handle(fastify, socket);
   });
 
-  fastify.ready().then(() => {
-    initJobSubscriber(fastify); // runs only once
-  });
+  // fastify.ready().then(() => {
+  //   initJobSubscriber(fastify); // runs only once
+  // });
 };

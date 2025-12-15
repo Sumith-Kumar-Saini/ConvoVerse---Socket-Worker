@@ -5,28 +5,28 @@ const activeRooms = new Set<string>();
 
 export async function dynamicInitJobSubscriber(
   fastify: FastifyInstance,
-  roomId: string
+  chatId: string
 ) {
-  if (activeRooms.has(roomId)) return;
-  activeRooms.add(roomId);
+  if (activeRooms.has(chatId)) return;
+  activeRooms.add(chatId);
 
   const sub = await RedisClient.getSubscriber();
-  const events = [`job:stream:${roomId}`, `job:end:${roomId}`];
+  const events = [`chat:stream:${chatId}`, `chat:end:${chatId}`];
 
   const handler = async (channel: string, message: string) => {
     if (!events.includes(channel)) return;
 
-    const data = JSON.parse(message) as { chunk?: string; roomId: string };
+    const data = JSON.parse(message) as { chunk?: string; chatId: string };
 
     if (channel === events[0]) {
-      fastify.io.to(data.roomId).emit("msg:stream", String(data.chunk));
+      fastify.io.to(data.chatId).emit("msg:stream", String(data.chunk));
     }
 
     if (channel === events[1]) {
-      fastify.io.to(data.roomId).emit("msg:end");
+      fastify.io.to(data.chatId).emit("msg:end");
       await sub.unsubscribe(...events);
       sub.off("message", handler);
-      activeRooms.delete(roomId); // ✅ cleanup
+      activeRooms.delete(chatId); // ✅ cleanup
     }
   };
 

@@ -14,12 +14,12 @@ export class ChatSocketController implements SocketController {
     socket.on(
       "msg:send",
       async (message: string, ack: (data: unknown) => void) => {
-        const roomId = generateRandomText();
-        socket.join(roomId);
+        const chatId = generateRandomText();
+        socket.join(chatId);
         const Queue = await LLMQueue.getLLMQueue();
-        const job = await Queue.add("stream-response", { roomId });
+        const job = await Queue.add("stream-response", { chatId, message });
         ack({ jobId: job?.id });
-        await dynamicInitJobSubscriber(fastify, roomId);
+        await dynamicInitJobSubscriber(fastify, chatId);
       }
     );
   }

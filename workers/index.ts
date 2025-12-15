@@ -18,13 +18,13 @@ async function initWorker() {
       for await (const chunk of stream) {
         process.stdout.write(chunk + "\r\n");
         await redis.publish(
-          `job:stream:${job.data.roomId}`,
-          JSON.stringify({ chunk, roomId: job.data.roomId })
+          `job:stream:${job.data.chatId}`,
+          JSON.stringify({ chunk, chatId: job.data.chatId })
         );
       }
       await redis.publish(
-        `job:end:${job.data.roomId}`,
-        JSON.stringify({ roomId: job.data.roomId })
+        `job:end:${job.data.chatId}`,
+        JSON.stringify({ chatId: job.data.chatId })
       );
     },
     {
